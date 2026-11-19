@@ -1,0 +1,31 @@
+---
+title: Starlight Page History
+description: Show every version of a Starlight page and what changed, built from your Git history.
+template: splash
+hero:
+  tagline: Every page gets a history page with each version and what changed in it, paragraph by paragraph. Built from Git, with no server and no token.
+  actions:
+    - text: Get started
+      link: getting-started/
+      icon: right-arrow
+    - text: See a history page
+      link: guides/demo/history/
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<CardGrid>
+  <Card title="Reads like a review" icon="document">
+    Paragraphs, headings, lists, tables and code blocks are matched first, then the words that changed are marked inside them.
+  </Card>
+  <Card title="Built from Git" icon="seti:git">
+    Each commit that changed a page is a version, with its date, author and message. Renames are followed.
+  </Card>
+  <Card title="Private repositories welcome" icon="approve-check">
+    History pages are static HTML. Readers see what changed without a Git account or access to the repository.
+  </Card>
+  <Card title="Translated" icon="translate">
+    English, Italian, German, French and Spanish, and every string can be changed like Starlight's own.
+  </Card>
+</CardGrid>

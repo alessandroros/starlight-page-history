@@ -1,0 +1,63 @@
+{
+  "name": "starlight-page-history",
+  "version": "0.0.0",
+  "description": "🕰️ Show every version of a Starlight page and what changed, paragraph by paragraph, built from your Git history.",
+  "license": "MIT",
+  "author": "Alessandro Rosa",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alessandroros/starlight-page-history.git",
+    "directory": "packages/starlight-page-history"
+  },
+  "homepage": "https://alessandroros.github.io/starlight-page-history/",
+  "bugs": "https://github.com/alessandroros/starlight-page-history/issues",
+  "keywords": [
+    "withastro",
+    "starlight",
+    "starlight-plugin",
+    "astro",
+    "history",
+    "diff",
+    "changes",
+    "revisions",
+    "git",
+    "documentation",
+    "docs-review"
+  ],
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
+    "./components/HistoryLink.astro": "./src/HistoryLink.astro",
+    "./components/LastUpdated.astro": "./src/LastUpdated.astro",
+    "./styles.css": "./src/styles.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "src",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "@astrojs/starlight": ">=0.32.0"
+  },
+  "dependencies": {
+    "diff": "^9.0.0"
+  },
+  "devDependencies": {
+    "vitest": "~5.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

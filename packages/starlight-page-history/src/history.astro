@@ -1,0 +1,106 @@
+---
+// The history page of a docs page, at /<page>/history/: every version,
+// newest first, each with what changed since the one before.
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { getCollection } from 'astro:content';
+import { diffPages, renderDiff } from './diff.js';
+import { commitUrl, historyOf, pageSlug, settings } from './pages.js';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('docs');
+  return entries.filter((entry) => historyOf(entry)).map((entry) => ({ params: { slug: pageSlug(entry.id) || undefined }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { versions: all } = historyOf(entry);
+const versions = settings.limit ? all.slice(0, settings.limit) : all;
+const older = all.length - versions.length;
+const { t } = Astro.locals;
+const lang = Astro.currentLocale ?? entry.data.lang ?? 'en';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const slug = pageSlug(entry.id);
+const pageHref = `${base}/${slug ? `${slug}/` : ''}`;
+
+const day = (iso) => new Date(iso).toLocaleDateString(lang, { dateStyle: 'medium' });
+const moment = (iso) => new Date(iso).toLocaleString(lang, { dateStyle: 'long', timeStyle: 'short' });
+const labels = { hidden: (count) => t('pageHistory.unchanged', { count }), noChange: t('pageHistory.noChange') };
+
+const items = versions.map((version, index) => {
+  const previous = all[index + 1];
+  const diff = previous ? diffPages(previous.text, version.text) : null;
+  return {
+    ...version,
+    id: `version-${version.sha.slice(0, 7)}`,
+    diff,
+    html: diff ? renderDiff(diff, labels) : null,
+    link: commitUrl(version.sha),
+  };
+});
+const headings = items.map((item) => ({ depth: 2, slug: item.id, text: `${day(item.date)} · ${item.subject}` }));
+---
+
+<StarlightPage
+  frontmatter={{
+    title: t('pageHistory.title', { title: entry.data.title }),
+    description: t('pageHistory.description'),
+    editUrl: false,
+    pagefind: false,
+    lastUpdated: false,
+    prev: false,
+    next: false,
+  }}
+  headings={headings}
+>
+  <p class="ph-intro">
+    <a href={pageHref}>← {entry.data.title}</a>
+    <span>
+      {t('pageHistory.versions', { count: all.length, date: day(all.at(-1).date) })}
+    </span>
+  </p>
+  {
+    items.map((item, index) => (
+      <section class="ph-version" aria-labelledby={item.id}>
+        <h2 id={item.id}>{item.subject}</h2>
+        <p class="ph-meta">
+          <time datetime={item.date}>{moment(item.date)}</time>
+          <span>{item.author}</span>
+          {item.link ? (
+            <a href={item.link}>
+              <code>{item.sha.slice(0, 7)}</code>
+            </a>
+          ) : (
+            <code>{item.sha.slice(0, 7)}</code>
+          )}
+          {item.diff?.changed && (
+            <span class="ph-stats">
+              {item.diff.stats.added > 0 && (
+                <span class="ph-stat-added" title={t('pageHistory.added', { count: item.diff.stats.added })}>
+                  +{item.diff.stats.added}
+                </span>
+              )}
+              {item.diff.stats.changed > 0 && (
+                <span class="ph-stat-changed" title={t('pageHistory.changed', { count: item.diff.stats.changed })}>
+                  ~{item.diff.stats.changed}
+                </span>
+              )}
+              {item.diff.stats.removed > 0 && (
+                <span class="ph-stat-removed" title={t('pageHistory.removed', { count: item.diff.stats.removed })}>
+                  −{item.diff.stats.removed}
+                </span>
+              )}
+            </span>
+          )}
+        </p>
+        {item.html ? (
+          <details class="ph-details" open={index === 0}>
+            <summary>{t('pageHistory.showChanges')}</summary>
+            <Fragment set:html={item.html} />
+          </details>
+        ) : (
+          <p class="ph-none">{t('pageHistory.created')}</p>
+        )}
+      </section>
+    ))
+  }
+  {older > 0 && <p class="ph-none">{t('pageHistory.older', { count: older })}</p>}
+</StarlightPage>

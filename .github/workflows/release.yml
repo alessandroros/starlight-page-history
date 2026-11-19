@@ -1,0 +1,43 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+  # Run it by hand after approving a staged version, to create its GitHub
+  # release without waiting for the next push.
+  workflow_dispatch:
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+permissions:
+  contents: write
+  pull-requests: write
+  # npm trusted publishing (stage only) and provenance
+  id-token: write
+
+jobs:
+  release:
+    if: github.repository == 'alessandroros/starlight-page-history'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The GitHub release tags the commit that set the version.
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      # `npm stage publish` needs npm 11.15 or later.
+      - run: npm install --global npm@11.19.1
+      - run: npm ci
+      - run: npm test
+      - uses: changesets/action@v1
+        with:
+          version: npm run version
+          publish: npm run release
+          commit: 'chore: version packages'
+          title: 'chore: version packages'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,6 +1,6 @@
 {
   "name": "starlight-page-history",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "🕰️ Show every version of a Starlight page and what changed, paragraph by paragraph, built from your Git history.",
   "license": "MIT",
   "author": "Alessandro Rosa",

@@ -43,3 +43,11 @@ Every string is a Starlight translation key, so you can change it in `src/conten
 | `pageHistory.changed_one` / `_other`       | `{{count}}` paragraphs changed                       |
 | `pageHistory.removed_one` / `_other`       | `{{count}}` paragraphs removed                       |
 | `pageHistory.older_one` / `_other`         | `{{count}}` older versions are not shown.            |
+| `pageHistory.compare`                      | Compare versions                                     |
+| `pageHistory.compareFrom`                  | From                                                 |
+| `pageHistory.compareTo`                    | To                                                   |
+| `pageHistory.compareButton`                | Compare                                              |
+| `pageHistory.compareLatest`                | Compare with the latest                              |
+| `pageHistory.compareSame`                  | Choose two different versions.                       |
+| `pageHistory.compareLoading`               | Loading the versions…                                |
+| `pageHistory.compareError`                 | The versions could not be loaded.                    |

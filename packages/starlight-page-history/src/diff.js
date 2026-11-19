@@ -117,8 +117,18 @@ function headingOf(block) {
  * @param {string} after The newer text.
  * @param {{ context?: number }} [options] Unchanged blocks shown around a change.
  */
-export function diffPages(before, after, { context = 1 } = {}) {
-  const parts = diffArrays(splitBlocks(before), splitBlocks(after));
+export function diffPages(before, after, options) {
+  return diffBlocks(splitBlocks(before), splitBlocks(after), options);
+}
+
+/**
+ * Compares two versions already cut into blocks (see `splitBlocks`).
+ * @param {string[]} beforeBlocks
+ * @param {string[]} afterBlocks
+ * @param {{ context?: number }} [options]
+ */
+export function diffBlocks(beforeBlocks, afterBlocks, { context = 1 } = {}) {
+  const parts = diffArrays(beforeBlocks, afterBlocks);
   /** @type {{ type: 'same' | 'added' | 'removed' | 'changed', before?: string, after?: string }[]} */
   const ops = [];
   for (let i = 0; i < parts.length; i++) {
@@ -317,4 +327,21 @@ export function renderDiff(diff, labels) {
       .join('')}</div>`;
   });
   return `<div class="ph-diff">${html.join('')}${skip(diff.hiddenAfter)}</div>`;
+}
+
+/** The JSON of a page's versions, newest first, with a shared block table. */
+export function packVersions(versions) {
+  const blocks = [];
+  const index = new Map();
+  const id = (block) => {
+    if (!index.has(block)) {
+      index.set(block, blocks.length);
+      blocks.push(block);
+    }
+    return index.get(block);
+  };
+  return {
+    blocks,
+    versions: versions.map(({ sha, author, date, subject, text }) => ({ sha, author, date, subject, blocks: splitBlocks(text).map(id) })),
+  };
 }

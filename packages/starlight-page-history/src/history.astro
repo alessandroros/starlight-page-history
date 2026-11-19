@@ -37,6 +37,23 @@ const items = versions.map((version, index) => {
   };
 });
 const headings = items.map((item) => ({ depth: 2, slug: item.id, text: `${day(item.date)} · ${item.subject}` }));
+
+// Compare any two versions, in the browser (compare.js).
+const short = (sha) => sha.slice(0, 7);
+const cut = (text, max) => (text.length > max ? `${text.slice(0, max - 1)}…` : text);
+const options = all.map((version) => ({ value: short(version.sha), label: `${day(version.date)} · ${cut(version.subject, 60)} (${short(version.sha)})` }));
+// Each plural in both forms, with {count} for the browser to fill in.
+const forms = (key) => ({ one: t(`${key}_one`, { count: '{count}' }), other: t(`${key}_other`, { count: '{count}' }) });
+const compareLabels = {
+  hidden: forms('pageHistory.unchanged'),
+  added: forms('pageHistory.added'),
+  changed: forms('pageHistory.changed'),
+  removed: forms('pageHistory.removed'),
+  noChange: t('pageHistory.noChange'),
+  same: t('pageHistory.compareSame'),
+  loading: t('pageHistory.compareLoading'),
+  error: t('pageHistory.compareError'),
+};
 ---
 
 <StarlightPage
@@ -58,6 +75,37 @@ const headings = items.map((item) => ({ depth: 2, slug: item.id, text: `${day(it
     </span>
   </p>
   {
+    all.length > 1 && (
+      <details class="ph-compare-box">
+        <summary>{t('pageHistory.compare')}</summary>
+        <form class="ph-compare" data-src={`${pageHref}${settings.route}/versions.json`} data-labels={JSON.stringify(compareLabels)}>
+          <label>
+            {t('pageHistory.compareFrom')}
+            <select name="from">
+              {options.map((option, index) => (
+                <option value={option.value} selected={index === 1}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            {t('pageHistory.compareTo')}
+            <select name="to">
+              {options.map((option, index) => (
+                <option value={option.value} selected={index === 0}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button type="submit">{t('pageHistory.compareButton')}</button>
+        </form>
+        <div class="ph-compare-result" aria-live="polite" />
+      </details>
+    )
+  }
+  {
     items.map((item, index) => (
       <section class="ph-version" aria-labelledby={item.id}>
         <h2 id={item.id}>{item.subject}</h2>
@@ -70,6 +118,11 @@ const headings = items.map((item) => ({ depth: 2, slug: item.id, text: `${day(it
             </a>
           ) : (
             <code>{item.sha.slice(0, 7)}</code>
+          )}
+          {index > 0 && (
+            <a href={`?from=${short(item.sha)}&to=${short(all[0].sha)}`} data-compare-from={short(item.sha)}>
+              {t('pageHistory.compareLatest')}
+            </a>
           )}
           {item.diff?.changed && (
             <span class="ph-stats">
@@ -103,4 +156,7 @@ const headings = items.map((item) => ({ depth: 2, slug: item.id, text: `${day(it
     ))
   }
   {older > 0 && <p class="ph-none">{t('pageHistory.older', { count: older })}</p>}
+  <script>
+    import './compare.js';
+  </script>
 </StarlightPage>

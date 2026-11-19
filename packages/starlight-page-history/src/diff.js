@@ -167,9 +167,17 @@ export function diffPages(before, after, { context = 1 } = {}) {
     }
     const last = hunks.at(-1);
     if (last && hidden === 0 && index > 0 && shown[index - 1]) last.ops.push(op);
-    else hunks.push({ hiddenBefore: hidden, section: sections[index], ops: [op] });
+    else hunks.push({ hiddenBefore: hidden, section: [], ops: [op], first: index });
     hidden = 0;
   });
+  // A hunk is labelled with the section of its first change, less the
+  // headings it shows itself.
+  for (const hunk of hunks) {
+    const firstChange = hunk.first + hunk.ops.findIndex((op) => op.type !== 'same');
+    const shownHeadings = new Set(hunk.ops.map((op) => headingOf(op.after ?? op.before)?.text).filter(Boolean));
+    hunk.section = sections[firstChange].filter((text) => !shownHeadings.has(text));
+    delete hunk.first;
+  }
   return { hunks, hiddenAfter: hidden, stats, changed: stats.added + stats.removed + stats.changed > 0 };
 }
 

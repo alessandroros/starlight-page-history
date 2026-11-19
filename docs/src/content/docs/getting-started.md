@@ -43,4 +43,10 @@ Each version shows its date, author, commit message and a short summary such as 
 - an edited paragraph marks the words removed and added;
 - a long table, list or code block shows only the lines around what changed.
 
+## Compare two versions
+
+Each version shows only what its own commit changed. To see everything that changed over a period, for example since a review, open **Compare versions** at the top of the history page and pick a **From** and a **To** version. **Compare with the latest**, under each version, does the same against the newest one.
+
+The address keeps the two versions (`?from=…&to=…`), so a comparison can be shared as a link.
+
 Try it on the [demo page's history](/starlight-page-history/guides/demo/history/).

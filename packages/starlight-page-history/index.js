@@ -87,6 +87,12 @@ function historyIntegration(config, logger) {
           entrypoint: fileURLToPath(new URL('./src/history.astro', import.meta.url)),
           prerender: true,
         });
+        // Every version of the page, for comparing any two in the browser.
+        injectRoute({
+          pattern: `/[...slug]/${config.route}/versions.json`,
+          entrypoint: fileURLToPath(new URL('./src/versions.js', import.meta.url)),
+          prerender: true,
+        });
       },
     },
   };

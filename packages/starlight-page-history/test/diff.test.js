@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { diffPages, kindOf, renderDiff, splitBlocks, wordChanges } from '../src/diff.js';
+import { diffBlocks, diffPages, kindOf, packVersions, renderDiff, splitBlocks, wordChanges } from '../src/diff.js';
 
 const labels = { hidden: (count) => `${count} hidden`, noChange: 'No change' };
 
@@ -100,5 +100,28 @@ describe('renderDiff', () => {
     const html = renderDiff(diffPages(`${list}\n\nOld.`, `${list}\n\nNew.`), labels);
     expect(html).toContain('<span class="ph-gap">⋯</span>\n- item 8\n- item 9');
     expect(html).not.toContain('item 0');
+  });
+});
+
+describe('comparing any two versions', () => {
+  const versions = [
+    { sha: 'c3', author: 'Ada', date: '2026-01-03', subject: 'reject', text: '# RFC\n\n- Status: Rejected\n\nShared paragraph.\n\nRejected note.' },
+    { sha: 'b2', author: 'Ada', date: '2026-01-02', subject: 'questions', text: '# RFC\n\n- Status: Draft\n\nShared paragraph.\n\nQuestions.' },
+    { sha: 'a1', author: 'Ada', date: '2026-01-01', subject: 'first', text: '# RFC\n\n- Status: Draft\n\nShared paragraph.' },
+  ];
+
+  it('stores each block once and keeps every version', () => {
+    const { blocks, versions: packed } = packVersions(versions);
+    expect(blocks.filter((block) => block === 'Shared paragraph.')).toHaveLength(1);
+    expect(blocks).toHaveLength(6);
+    expect(packed.map((version) => version.sha)).toEqual(['c3', 'b2', 'a1']);
+    expect(packed[2]).toEqual({ sha: 'a1', author: 'Ada', date: '2026-01-01', subject: 'first', blocks: [0, 4, 2] });
+  });
+
+  it('diffs unpacked blocks like the texts they come from', () => {
+    const { blocks, versions: packed } = packVersions(versions);
+    const unpack = (version) => version.blocks.map((id) => blocks[id]);
+    expect(diffBlocks(unpack(packed[2]), unpack(packed[0]))).toEqual(diffPages(versions[2].text, versions[0].text));
+    expect(renderDiff(diffBlocks(unpack(packed[2]), unpack(packed[0])), labels)).toContain('- Status: <del>Draft</del><ins>Rejected</ins>');
   });
 });

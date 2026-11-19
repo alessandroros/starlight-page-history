@@ -4,6 +4,7 @@
 
 - A **Page history** link in the footer of every page, next to "Last updated".
 - A history page per page, at `/<page>/history/`: each commit that changed it, newest first, with its date, author and message.
+- **Compare any two versions**: pick a "from" and a "to" version, or click **Compare with the latest** under a version, to see everything that changed in between. The link can be shared.
 - Changes read like a review, not like a patch: paragraphs, headings, lists, tables and code blocks are matched first, then the words that changed are marked inside them. Long blocks show only the lines around a change.
 - Built at build time from `git log`. No server, no API, no token: it works for private repositories, and readers need no Git account.
 - Follows renames. Works when your pages are copied or generated from another folder: it then finds the file through the page's `editUrl`.

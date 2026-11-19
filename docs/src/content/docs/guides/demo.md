@@ -11,8 +11,13 @@ The office is open from Monday to Friday, from 8:30 to 17:30. On Saturdays it op
 
 ## Contact
 
-Write to the support team for questions about your account.
+Write to support@example.com for questions about your account. Answers come within one working day.
+
+| Channel | When |
+| ------- | ---- |
+| Email   | Any time |
+| Phone   | Office hours |
 
 ## Holidays
 
-The office is closed on public holidays. The support team still answers urgent questions.
+The office is closed on public holidays. Urgent questions are answered by phone.

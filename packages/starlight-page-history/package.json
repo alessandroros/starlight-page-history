@@ -31,6 +31,8 @@
       "default": "./index.js"
     },
     "./components/HistoryLink.astro": "./src/HistoryLink.astro",
+    "./components/HistoryTitleLine.astro": "./src/HistoryTitleLine.astro",
+    "./components/PageTitle.astro": "./src/PageTitle.astro",
     "./components/LastUpdated.astro": "./src/LastUpdated.astro",
     "./styles.css": "./src/styles.css",
     "./package.json": "./package.json"

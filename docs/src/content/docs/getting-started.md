@@ -3,7 +3,7 @@ title: Getting started
 description: Install the plugin and give every page a history.
 ---
 
-starlight-page-history adds a **Page history** link to the footer of every page. It opens `/<page>/history/`, which lists each commit that changed the page, newest first, and what changed in it.
+starlight-page-history adds a line under the title of every page: when it last changed, how many versions it has, and a **Page history** link. The same link is in the footer. It opens `/<page>/history/`, which lists each commit that changed the page, newest first, and what changed in it.
 
 ## Install
 
@@ -28,7 +28,7 @@ export default defineConfig({
 });
 ```
 
-Run `npm run dev` and open any page: the link is at the bottom, next to "Last updated" when you have it on. Only pages Git knows about get one, so commit a page to see its history.
+Run `npm run dev` and open any page: the line is under the title, and the link is also at the bottom, next to "Last updated" when you have it on. Only pages Git knows about get one, so commit a page to see its history.
 
 ## Build with the whole history
 

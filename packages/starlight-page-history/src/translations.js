@@ -2,6 +2,9 @@
 // your own src/content/i18n/<lang>.json, like Starlight's strings.
 export const translations = {
   en: {
+    'pageHistory.updated': 'Updated',
+    'pageHistory.versionCount_one': '{{count}} version',
+    'pageHistory.versionCount_other': '{{count}} versions',
     'pageHistory.compare': 'Compare versions',
     'pageHistory.compareFrom': 'From',
     'pageHistory.compareTo': 'To',
@@ -30,6 +33,9 @@ export const translations = {
     'pageHistory.older_other': '{{count}} older versions are not shown.',
   },
   it: {
+    'pageHistory.updated': 'Aggiornata il',
+    'pageHistory.versionCount_one': '{{count}} versione',
+    'pageHistory.versionCount_other': '{{count}} versioni',
     'pageHistory.compare': 'Confronta versioni',
     'pageHistory.compareFrom': 'Da',
     'pageHistory.compareTo': 'A',
@@ -58,6 +64,9 @@ export const translations = {
     'pageHistory.older_other': '{{count}} versioni precedenti non sono mostrate.',
   },
   de: {
+    'pageHistory.updated': 'Aktualisiert am',
+    'pageHistory.versionCount_one': '{{count}} Version',
+    'pageHistory.versionCount_other': '{{count}} Versionen',
     'pageHistory.compare': 'Versionen vergleichen',
     'pageHistory.compareFrom': 'Von',
     'pageHistory.compareTo': 'Bis',
@@ -86,6 +95,9 @@ export const translations = {
     'pageHistory.older_other': '{{count}} ältere Versionen werden nicht angezeigt.',
   },
   fr: {
+    'pageHistory.updated': 'Mise à jour le',
+    'pageHistory.versionCount_one': '{{count}} version',
+    'pageHistory.versionCount_other': '{{count}} versions',
     'pageHistory.compare': 'Comparer des versions',
     'pageHistory.compareFrom': 'De',
     'pageHistory.compareTo': 'À',
@@ -114,6 +126,9 @@ export const translations = {
     'pageHistory.older_other': '{{count}} versions plus anciennes ne sont pas affichées.',
   },
   es: {
+    'pageHistory.updated': 'Actualizada el',
+    'pageHistory.versionCount_one': '{{count}} versión',
+    'pageHistory.versionCount_other': '{{count}} versiones',
     'pageHistory.compare': 'Comparar versiones',
     'pageHistory.compareFrom': 'Desde',
     'pageHistory.compareTo': 'Hasta',

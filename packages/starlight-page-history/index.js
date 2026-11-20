@@ -7,7 +7,20 @@ import { translations } from './src/translations.js';
 
 const VIRTUAL_ID = 'virtual:starlight-page-history/config';
 const RESOLVED_ID = `\0${VIRTUAL_ID}`;
-const COMPONENT = 'starlight-page-history/components/LastUpdated.astro';
+// Where the link goes: the Starlight component the plugin overrides, and
+// what to tell a site that already overrides it.
+const PLACES = {
+  title: {
+    component: 'PageTitle',
+    ours: 'starlight-page-history/components/PageTitle.astro',
+    hint: "import HistoryTitleLine from 'starlight-page-history/components/HistoryTitleLine.astro' and render <HistoryTitleLine /> after the <h1>",
+  },
+  footer: {
+    component: 'LastUpdated',
+    ours: 'starlight-page-history/components/LastUpdated.astro',
+    hint: "import HistoryLink from 'starlight-page-history/components/HistoryLink.astro' and render <HistoryLink />",
+  },
+};
 
 /** @param {import('./index').StarlightPageHistoryOptions} [options] */
 export default function starlightPageHistory(options = {}) {
@@ -19,19 +32,20 @@ export default function starlightPageHistory(options = {}) {
         injectTranslations(translations);
       },
       'config:setup'({ addIntegration, config: starlightConfig, updateConfig, logger }) {
-        const components = starlightConfig.components ?? {};
-        const own = components.LastUpdated;
+        // The link sits under the page title and in the footer, next to "Last updated".
+        const components = { ...(starlightConfig.components ?? {}) };
+        for (const place of config.links) {
+          const { component, ours, hint } = PLACES[place];
+          const own = components[component];
+          if (!own) components[component] = ours;
+          else if (own !== ours) {
+            logger.warn(`You override ${component}, so the history link is not added there for you. Add it to your component: ${hint}.`);
+          }
+        }
         updateConfig({
           customCss: [...(starlightConfig.customCss ?? []), 'starlight-page-history/styles.css'],
-          // The link sits in the page footer, next to "Last updated".
-          ...(own ? {} : { components: { ...components, LastUpdated: COMPONENT } }),
+          components,
         });
-        if (own && own !== COMPONENT) {
-          logger.warn(
-            'You override LastUpdated, so the "Page history" link is not added for you. ' +
-              "Add it to your component: import HistoryLink from 'starlight-page-history/components/HistoryLink.astro' and render <HistoryLink />.",
-          );
-        }
         addIntegration(historyIntegration(config, logger));
       },
     },
@@ -51,7 +65,11 @@ function resolveOptions(options) {
   if (commitUrl !== null && commitUrl !== false && (typeof commitUrl !== 'string' || !commitUrl.includes('{sha}'))) {
     throw new Error('starlight-page-history: "commitUrl" must be a URL with {sha} in it, or false.');
   }
-  return { route, limit, commitUrl, exclude: options.exclude ?? [] };
+  const links = options.links ?? ['title', 'footer'];
+  if (!Array.isArray(links) || links.some((place) => !(place in PLACES))) {
+    throw new Error('starlight-page-history: "links" must list where the link goes: "title", "footer", both, or none ([]).');
+  }
+  return { route, limit, commitUrl, exclude: options.exclude ?? [], links: [...new Set(links)] };
 }
 
 function historyIntegration(config, logger) {

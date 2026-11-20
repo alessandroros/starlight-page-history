@@ -2,7 +2,7 @@
 
 🕰️ Show every version of a [Starlight](https://starlight.astro.build) page and what changed, paragraph by paragraph, built from your Git history.
 
-- A **Page history** link in the footer of every page, next to "Last updated".
+- Under every page title, when the page last changed, how many versions it has, and a **Page history** link. The link is in the footer too, next to "Last updated".
 - A history page per page, at `/<page>/history/`: each commit that changed it, newest first, with its date, author and message.
 - **Compare any two versions**: pick a "from" and a "to" version, or click **Compare with the latest** under a version, to see everything that changed in between. The link can be shared.
 - Changes read like a review, not like a patch: paragraphs, headings, lists, tables and code blocks are matched first, then the words that changed are marked inside them. Long blocks show only the lines around a change.
@@ -51,11 +51,12 @@ The plugin warns during the build when the clone is shallow.
 | `route`     | `'history'`    | The last segment of a history page URL.                                                       |
 | `limit`     | `0`            | How many versions a history page shows. `0` shows them all.                                   |
 | `commitUrl` | from `origin`  | A link to each commit, with `{sha}` in it, or `false` for no links.                           |
+| `links`     | `['title', 'footer']` | Where pages link to their history: under the title, in the footer, both, or `[]`.  |
 | `exclude`   | `[]`           | Pages without history: a slug (`'guides/draft'`) or a folder ending in `/` (`'reference/'`). |
 
-## Your own LastUpdated component
+## Your own PageTitle or LastUpdated component
 
-The link is added by overriding Starlight's `LastUpdated` component. If you override it yourself, the plugin leaves yours alone and tells you so. Add the link to your component:
+The links are added by overriding Starlight's `PageTitle` and `LastUpdated` components. If you override one of them yourself, the plugin leaves yours alone and tells you so. Add the link to your component: `HistoryTitleLine` for the title, `HistoryLink` for the footer.
 
 ```astro
 ---

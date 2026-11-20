@@ -186,3 +186,22 @@
 .sl-markdown-content .ph-compare-result:not(:empty) {
   margin-top: 1rem;
 }
+
+/* The line under the page title. */
+.ph-title-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.5rem;
+  margin-top: 0.5rem;
+  font-size: var(--sl-text-sm);
+  color: var(--sl-color-gray-3);
+}
+.ph-title-line a {
+  font-weight: 600;
+  color: var(--sl-color-text-accent);
+  text-decoration: none;
+}
+.ph-title-line a:hover {
+  text-decoration: underline;
+}

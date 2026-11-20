@@ -1,11 +1,28 @@
 ---
-title: Your own footer
-description: Keep the Page history link when you override LastUpdated.
+title: Your own components
+description: Keep the history links when you override PageTitle or LastUpdated.
 ---
 
-The plugin places its link by overriding Starlight's [`LastUpdated`](https://starlight.astro.build/reference/overrides/#lastupdated) component: Starlight's own date, then the link.
+The plugin places its links by overriding two Starlight components:
 
-If your site already overrides `LastUpdated`, the plugin leaves your component alone and logs a warning. Add the link where you want it:
+- [`PageTitle`](https://starlight.astro.build/reference/overrides/#pagetitle): Starlight's title, then the line with the last change, the number of versions and the link;
+- [`LastUpdated`](https://starlight.astro.build/reference/overrides/#lastupdated): Starlight's own date, then the link.
+
+If your site already overrides one of them, the plugin leaves your component alone and logs a warning. Add the history part where you want it.
+
+## PageTitle
+
+```astro title="src/components/PageTitle.astro"
+---
+import Default from '@astrojs/starlight/components/PageTitle.astro';
+import HistoryTitleLine from 'starlight-page-history/components/HistoryTitleLine.astro';
+---
+
+<Default />
+<HistoryTitleLine />
+```
+
+## LastUpdated
 
 ```astro title="src/components/LastUpdated.astro"
 ---
@@ -17,7 +34,7 @@ import HistoryLink from 'starlight-page-history/components/HistoryLink.astro';
 <HistoryLink />
 ```
 
-`HistoryLink` renders nothing on a page without history.
+`HistoryTitleLine` and `HistoryLink` render nothing on a page without history.
 
 ## Changing the words
 
@@ -32,6 +49,8 @@ Every string is a Starlight translation key, so you can change it in `src/conten
 | Key                                        | English                                              |
 | ------------------------------------------ | ---------------------------------------------------- |
 | `pageHistory.link`                         | Page history                                         |
+| `pageHistory.updated`                      | Updated                                              |
+| `pageHistory.versionCount_one` / `_other`  | `{{count}}` versions                                 |
 | `pageHistory.title`                        | History: `{{title}}`                                 |
 | `pageHistory.description`                  | Every version of this page and what changed in each. |
 | `pageHistory.versions_one` / `_other`      | `{{count}}` versions, since `{{date}}`               |

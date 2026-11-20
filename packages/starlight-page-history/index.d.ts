@@ -18,6 +18,13 @@ export interface StarlightPageHistoryOptions {
    */
   commitUrl?: string | false;
   /**
+   * Where pages link to their history: `'title'`, a line under the page
+   * title with the last change and the number of versions; `'footer'`, next
+   * to "Last updated". `[]` adds no link.
+   * @default ['title', 'footer']
+   */
+  links?: Array<'title' | 'footer'>;
+  /**
    * Pages without a history page. A slug (`'guides/draft'`) or a folder
    * ending in `/` (`'reference/'`).
    * @default []

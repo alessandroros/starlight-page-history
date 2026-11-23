@@ -3,7 +3,7 @@ title: Getting started
 description: Install the plugin and give every page a history.
 ---
 
-starlight-page-history adds a line under the title of every page: when it last changed, how many versions it has, and a **Page history** link. The same link is in the footer. It opens `/<page>/history/`, which lists each commit that changed the page, newest first, and what changed in it.
+starlight-page-history adds a line under the title of every page: when it last changed, how many versions it has, and a **Page history** link. The same link is in the footer. It opens `/<page>/history/`: a timeline with a dot for each commit that changed the page, and what changed in the versions you pick on it.
 
 ## Install
 
@@ -36,17 +36,25 @@ History pages are built from the Git clone your build runs in. Many CI services 
 
 ## What readers see
 
-Each version shows its date, author, commit message and a short summary such as **+2 ~1 −1**: paragraphs added, changed and removed. Open **Changes** to read them:
+The history page opens on what is new for the reader: the changes since their last visit, or the latest change on a first visit.
+
+- **Presets** cover the usual questions in one click: **Since your last visit**, **Latest change**, **Last 7 days**, **Last 30 days** and **From the start**.
+- **The timeline** has a dot for each version, grouped by day. A bigger dot changed more text. Dots the reader has not seen yet are coloured, and an orange line marks their last visit. Hover a dot for its date, author, message and summary.
+- **Click a dot** to see what that version changed. **Drag over several**, or Shift-click, to see everything that changed over that period as one change. The arrow keys move along the timeline, and Shift widens the period.
+
+Under the timeline, a title says what is shown, such as "What changed from November 18 to November 20", followed by who changed it, the commits, a summary such as **+2 ~1 −1** (paragraphs added, changed and removed), and the changes:
 
 - unchanged paragraphs are folded into a count, with one around each change for context;
 - the section each change sits in is shown above it;
 - an edited paragraph marks the words removed and added;
 - a long table, list or code block shows only the lines around what changed.
 
-## Compare two versions
+The address keeps what is shown (`?from=…&to=…`), so it can be shared as a link.
 
-Each version shows only what its own commit changed. To see everything that changed over a period, for example since a review, open **Compare versions** at the top of the history page and pick a **From** and a **To** version. **Compare with the latest**, under each version, does the same against the newest one.
+## Since your last visit
 
-The address keeps the two versions (`?from=…&to=…`), so a comparison can be shared as a link.
+When a reader opens a page, their browser remembers which version they saw, in `localStorage`. Nothing is sent anywhere and nothing is stored on a server. When the page has changed since, the line under the title says **Changed since your last visit** until they look at those changes, and the history page opens on them.
+
+A reader who has never opened the page, uses private browsing or has turned storage off simply starts with the latest change.
 
 Try it on the [demo page's history](/starlight-page-history/guides/demo/history/).

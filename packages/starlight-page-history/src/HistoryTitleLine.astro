@@ -1,6 +1,7 @@
 ---
 // The line under the page title: when the page last changed, how many
-// versions it has, and the link to its history. Nothing without history.
+// versions it has, and the link to its history. When the page changed since
+// the reader's last visit, it says so (visit.js). Nothing without history.
 import { historyOf, historyUrl } from './pages.js';
 
 const route = Astro.locals.starlightRoute;
@@ -13,7 +14,7 @@ const date = latest && new Date(latest.date);
 
 {
   href && (
-    <p class="ph-title-line">
+    <p class="ph-title-line" data-ph-key={href} data-ph-latest={latest.sha}>
       <span>
         {t('pageHistory.updated')}{' '}
         <time datetime={latest.date}>{date.toLocaleDateString(route.lang, { dateStyle: 'medium' })}</time>
@@ -22,6 +23,12 @@ const date = latest && new Date(latest.date);
       <span>{t('pageHistory.versionCount', { count: history.versions.length })}</span>
       <span aria-hidden="true">·</span>
       <a href={href}>{t('pageHistory.link')} →</a>
+      <a class="ph-new" href={href} data-ph-key={href} hidden>
+        {t('pageHistory.newSince')}
+      </a>
     </p>
   )
 }
+<script>
+  import './visit.js';
+</script>

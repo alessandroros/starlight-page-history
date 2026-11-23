@@ -3,10 +3,10 @@
 🕰️ Show every version of a [Starlight](https://starlight.astro.build) page and what changed, paragraph by paragraph, built from your Git history.
 
 - Under every page title, when the page last changed, how many versions it has, and a **Page history** link. The link is in the footer too, next to "Last updated".
-- A history page per page, at `/<page>/history/`: each commit that changed it, newest first, with its date, author and message.
-- **Compare any two versions**: pick a "from" and a "to" version, or click **Compare with the latest** under a version, to see everything that changed in between. The link can be shared.
+- A history page per page, at `/<page>/history/`, with a **timeline**: a dot per commit, sized by how much it changed. Click a dot for that change, or drag over several to see everything that changed in that period. The link can be shared.
+- **Since your last visit**: each reader's browser remembers the version they last saw. The page then says **Changed since your last visit**, and the history opens on those changes. Presets cover the latest change and the last 7 or 30 days.
 - Changes read like a review, not like a patch: paragraphs, headings, lists, tables and code blocks are matched first, then the words that changed are marked inside them. Long blocks show only the lines around a change.
-- Built at build time from `git log`. No server, no API, no token: it works for private repositories, and readers need no Git account.
+- Built at build time from `git log`. No server, no API, no token: it works for private repositories, and readers need no Git account. Last visits stay in the reader's browser.
 - Follows renames. Works when your pages are copied or generated from another folder: it then finds the file through the page's `editUrl`.
 - In English, Italian, German, French and Spanish, and translatable like Starlight's own strings.
 

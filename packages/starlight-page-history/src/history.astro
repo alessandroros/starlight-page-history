@@ -95,7 +95,8 @@ const items = versions.flatMap((version, index) => {
 
 <StarlightPage
   frontmatter={{
-    title: t('pageHistory.title', { title: entry.data.title }),
+    // Astro escapes the title when it renders it: i18next must not as well.
+    title: t('pageHistory.title', { title: entry.data.title, interpolation: { escapeValue: false } }),
     description: t('pageHistory.description'),
     editUrl: false,
     pagefind: false,

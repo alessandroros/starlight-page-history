@@ -1,10 +1,13 @@
 ---
-// The history page of a docs page, at /<page>/history/: every version,
-// newest first, each with what changed since the one before.
+// The history page of a docs page, at /<page>/history/: a timeline of every
+// version, and what changed in the versions the reader picks on it. The page
+// is built showing the latest change; timeline.js handles the rest.
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { getCollection } from 'astro:content';
-import { diffPages, renderDiff } from './diff.js';
-import { commitUrl, historyOf, pageSlug, settings } from './pages.js';
+import { diffPages } from './diff.js';
+import { historyOf, historyUrl, pageSlug, settings } from './pages.js';
+import { dotSizes } from './timeline-model.js';
+import { formatDay, formatMoment, resultHtml } from './timeline-view.js';
 
 export async function getStaticPaths() {
   const entries = await getCollection('docs');
@@ -13,150 +16,149 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { versions: all } = historyOf(entry);
-const versions = settings.limit ? all.slice(0, settings.limit) : all;
-const older = all.length - versions.length;
+const shownNewestFirst = settings.limit ? all.slice(0, settings.limit) : all;
+const older = all.length - shownNewestFirst.length;
+const root = older === 0;
 const { t } = Astro.locals;
 const lang = Astro.currentLocale ?? entry.data.lang ?? 'en';
-const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-const slug = pageSlug(entry.id);
-const pageHref = `${base}/${slug ? `${slug}/` : ''}`;
+const historyHref = historyUrl(entry);
+const pageHref = historyHref.slice(0, -(settings.route.length + 1));
 
-const day = (iso) => new Date(iso).toLocaleDateString(lang, { dateStyle: 'medium' });
-const moment = (iso) => new Date(iso).toLocaleString(lang, { dateStyle: 'long', timeStyle: 'short' });
-const labels = { hidden: (count) => t('pageHistory.unchanged', { count }), noChange: t('pageHistory.noChange') };
-
-const items = versions.map((version, index) => {
-  const previous = all[index + 1];
-  const diff = previous ? diffPages(previous.text, version.text) : null;
-  return {
-    ...version,
-    id: `version-${version.sha.slice(0, 7)}`,
-    diff,
-    html: diff ? renderDiff(diff, labels) : null,
-    link: commitUrl(version.sha),
-  };
+// Oldest first, each with what it changed since the version before
+// (none for the first version of the page).
+const versions = [...shownNewestFirst].reverse().map((version, index, list) => {
+  const before = index > 0 ? list[index - 1] : all[shownNewestFirst.length];
+  const stats = before ? diffPages(before.text, version.text).stats : null;
+  return { sha: version.sha, date: version.date, author: version.author, subject: version.subject, stats };
 });
-const headings = items.map((item) => ({ depth: 2, slug: item.id, text: `${day(item.date)} · ${item.subject}` }));
+const sizes = dotSizes(versions.map(({ stats }) => (stats ? stats.added + stats.changed + stats.removed : 0)));
+const last = versions.length - 1;
 
-// Compare any two versions, in the browser (compare.js).
-const short = (sha) => sha.slice(0, 7);
-const cut = (text, max) => (text.length > max ? `${text.slice(0, max - 1)}…` : text);
-const options = all.map((version) => ({ value: short(version.sha), label: `${day(version.date)} · ${cut(version.subject, 60)} (${short(version.sha)})` }));
-// Each plural in both forms, with {count} for the browser to fill in.
-const forms = (key) => ({ one: t(`${key}_one`, { count: '{count}' }), other: t(`${key}_other`, { count: '{count}' }) });
-const compareLabels = {
+// Labels, with {placeholders} and both plural forms for the browser to fill in.
+const forms = (key, values = {}) => ({
+  one: t(`${key}_one`, { count: '{count}', ...values }),
+  other: t(`${key}_other`, { count: '{count}', ...values }),
+});
+const labels = {
   hidden: forms('pageHistory.unchanged'),
   added: forms('pageHistory.added'),
   changed: forms('pageHistory.changed'),
   removed: forms('pageHistory.removed'),
+  changesBy: forms('pageHistory.changesBy', { authors: '{authors}' }),
+  more: forms('pageHistory.more'),
   noChange: t('pageHistory.noChange'),
-  same: t('pageHistory.compareSame'),
-  loading: t('pageHistory.compareLoading'),
-  error: t('pageHistory.compareError'),
+  noTextChange: t('pageHistory.noTextChange'),
+  created: t('pageHistory.created'),
+  firstVersion: t('pageHistory.firstVersion'),
+  sinceFirst: t('pageHistory.sinceFirst'),
+  changedOn: t('pageHistory.changedOn', { date: '{date}' }),
+  changedBetween: t('pageHistory.changedBetween', { from: '{from}', to: '{to}' }),
+  lastVisit: t('pageHistory.lastVisit'),
+  error: t('pageHistory.error'),
+  empty: {
+    visit: t('pageHistory.presetFirstVisit'),
+    visitNothingNew: t('pageHistory.presetNothingNew'),
+    week: t('pageHistory.presetEmptyWeek'),
+    month: t('pageHistory.presetEmptyMonth'),
+  },
 };
+const presets = [
+  ['visit', t('pageHistory.presetVisit')],
+  ['latest', t('pageHistory.presetLatest')],
+  ['week', t('pageHistory.presetWeek')],
+  ['month', t('pageHistory.presetMonth')],
+  ['all', t('pageHistory.presetAll')],
+];
+
+// Built showing the latest change.
+const range = { start: last, end: last };
+const baseText = last > 0 ? shownNewestFirst[1].text : all[shownNewestFirst.length]?.text;
+const diff = baseText === undefined ? null : diffPages(baseText, shownNewestFirst[0].text);
+const result = resultHtml({ versions, range, diff, labels, lang, commitUrl: settings.commitUrl, root });
+
+const data = {
+  versions,
+  base: root ? null : all[shownNewestFirst.length].sha,
+  labels,
+  lang,
+  commitUrl: settings.commitUrl,
+  src: `${historyHref}versions.json`,
+  key: historyHref,
+};
+
+// Dots, with a mark where a new day starts.
+const items = versions.flatMap((version, index) => {
+  const newDay = index === 0 || new Date(version.date).toDateString() !== new Date(versions[index - 1].date).toDateString();
+  return [...(newDay ? [{ kind: 'day', label: formatDay(version.date, lang), first: index === 0 }] : []), { kind: 'dot', index, version }];
+});
 ---
 
 <StarlightPage
   frontmatter={{
-    title: t('pageHistory.title', { title: entry.data.title }),
+    // Astro escapes the title when it renders it: i18next must not as well.
+    title: t('pageHistory.title', { title: entry.data.title, interpolation: { escapeValue: false } }),
     description: t('pageHistory.description'),
     editUrl: false,
     pagefind: false,
+    tableOfContents: false,
     lastUpdated: false,
     prev: false,
     next: false,
   }}
-  headings={headings}
+  headings={[]}
 >
   <p class="ph-intro">
     <a href={pageHref}>← {entry.data.title}</a>
-    <span>
-      {t('pageHistory.versions', { count: all.length, date: day(all.at(-1).date) })}
-    </span>
+    <span>{t('pageHistory.versions', { count: all.length, date: formatDay(all.at(-1).date, lang) })}</span>
   </p>
-  {
-    all.length > 1 && (
-      <details class="ph-compare-box">
-        <summary>{t('pageHistory.compare')}</summary>
-        <form class="ph-compare" data-src={`${pageHref}${settings.route}/versions.json`} data-labels={JSON.stringify(compareLabels)}>
-          <label>
-            {t('pageHistory.compareFrom')}
-            <select name="from">
-              {options.map((option, index) => (
-                <option value={option.value} selected={index === 1}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            {t('pageHistory.compareTo')}
-            <select name="to">
-              {options.map((option, index) => (
-                <option value={option.value} selected={index === 0}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button type="submit">{t('pageHistory.compareButton')}</button>
-        </form>
-        <div class="ph-compare-result" aria-live="polite" />
-      </details>
-    )
-  }
-  {
-    items.map((item, index) => (
-      <section class="ph-version" aria-labelledby={item.id}>
-        <h2 id={item.id}>{item.subject}</h2>
-        <p class="ph-meta">
-          <time datetime={item.date}>{moment(item.date)}</time>
-          <span>{item.author}</span>
-          {item.link ? (
-            <a href={item.link}>
-              <code>{item.sha.slice(0, 7)}</code>
-            </a>
-          ) : (
-            <code>{item.sha.slice(0, 7)}</code>
-          )}
-          {index > 0 && (
-            <a href={`?from=${short(item.sha)}&to=${short(all[0].sha)}`} data-compare-from={short(item.sha)}>
-              {t('pageHistory.compareLatest')}
-            </a>
-          )}
-          {item.diff?.changed && (
-            <span class="ph-stats">
-              {item.diff.stats.added > 0 && (
-                <span class="ph-stat-added" title={t('pageHistory.added', { count: item.diff.stats.added })}>
-                  +{item.diff.stats.added}
-                </span>
-              )}
-              {item.diff.stats.changed > 0 && (
-                <span class="ph-stat-changed" title={t('pageHistory.changed', { count: item.diff.stats.changed })}>
-                  ~{item.diff.stats.changed}
-                </span>
-              )}
-              {item.diff.stats.removed > 0 && (
-                <span class="ph-stat-removed" title={t('pageHistory.removed', { count: item.diff.stats.removed })}>
-                  −{item.diff.stats.removed}
-                </span>
-              )}
-            </span>
-          )}
+  <div class="ph-history">
+    <div class="ph-controls not-content">
+      <div class="ph-presets" role="group" aria-label={t('pageHistory.period')}>
+        {
+          presets.map(([id, label]) => (
+            <button type="button" class:list={['ph-chip', { 'ph-active': id === 'latest' }]} data-preset={id} disabled={id === 'visit'}>
+              {label}
+            </button>
+          ))
+        }
+      </div>
+      <div class="ph-timeline">
+        <div class="ph-track" tabindex="0" role="group" aria-label={t('pageHistory.timeline')}>
+          {
+            items.map((item) =>
+              item.kind === 'day' ? (
+                <div class:list={['ph-day', { 'ph-first': item.first }]}>
+                  <span>{item.label}</span>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  class:list={['ph-dot', { 'ph-in ph-sel-start ph-sel-end': item.index === last, 'ph-origin': !item.version.stats }]}
+                  data-i={item.index}
+                  style={`--ph-r: ${sizes[item.index]}px`}
+                  aria-pressed={item.index === last ? 'true' : 'false'}
+                  aria-label={`${formatMoment(item.version.date, lang)}: ${item.version.subject}`}
+                >
+                  <span class="ph-pip" />
+                </button>
+              ),
+            )
+          }
+        </div>
+        <p class="ph-legend">
+          <span>{t('pageHistory.hint')}</span>
+          <span class="ph-legend-new">{t('pageHistory.legendNew')}</span>
+          <span class="ph-legend-seen">{t('pageHistory.legendSeen')}</span>
+          <span>{t('pageHistory.legendSize')}</span>
         </p>
-        {item.html ? (
-          <details class="ph-details" open={index === 0}>
-            <summary>{t('pageHistory.showChanges')}</summary>
-            <Fragment set:html={item.html} />
-          </details>
-        ) : (
-          <p class="ph-none">{t('pageHistory.created')}</p>
-        )}
-      </section>
-    ))
-  }
-  {older > 0 && <p class="ph-none">{t('pageHistory.older', { count: older })}</p>}
+        <div class="ph-tip" hidden />
+      </div>
+    </div>
+    <section class="ph-result" aria-live="polite" set:html={result} />
+    {older > 0 && <p class="ph-none">{t('pageHistory.older', { count: older })}</p>}
+    <script type="application/json" class="ph-data" set:html={JSON.stringify(data).replace(/</g, '\\u003c')} />
+  </div>
   <script>
-    import './compare.js';
+    import './timeline.js';
   </script>
 </StarlightPage>

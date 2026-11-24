@@ -23,7 +23,7 @@ The last segment of a history page URL: `/guides/setup/history/`. Pick another o
 
 **Default:** `0` (every version)
 
-How many versions a history page shows, newest first. The page then says how many older ones it leaves out. A page edited hundreds of times builds a large history page; a limit keeps it light.
+How many of the newest versions the timeline shows. The page then says how many older ones it leaves out. The history page stays light without a limit, so set one only to keep the timeline short.
 
 ## `commitUrl`
 

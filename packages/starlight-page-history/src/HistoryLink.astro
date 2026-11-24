@@ -2,15 +2,20 @@
 // The "Page history" link of the current page, if it has a history.
 // The plugin shows it in the footer. If you override LastUpdated yourself,
 // render <HistoryLink /> in your component.
-import { historyUrl } from './pages.js';
+import { historyOf, historyUrl } from './pages.js';
 
-const href = historyUrl(Astro.locals.starlightRoute?.entry);
+const entry = Astro.locals.starlightRoute?.entry;
+const history = historyOf(entry);
+const href = history && historyUrl(entry);
 ---
 
 {
   href && (
-    <p class="ph-link">
+    <p class="ph-link" data-ph-key={href} data-ph-latest={history.versions[0].sha}>
       <a href={href}>{Astro.locals.t('pageHistory.link')}</a>
     </p>
   )
 }
+<script>
+  import './visit.js';
+</script>

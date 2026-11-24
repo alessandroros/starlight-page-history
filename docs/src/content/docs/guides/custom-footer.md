@@ -46,27 +46,43 @@ Every string is a Starlight translation key, so you can change it in `src/conten
 }
 ```
 
-| Key                                        | English                                              |
-| ------------------------------------------ | ---------------------------------------------------- |
-| `pageHistory.link`                         | Page history                                         |
-| `pageHistory.updated`                      | Updated                                              |
-| `pageHistory.versionCount_one` / `_other`  | `{{count}}` versions                                 |
-| `pageHistory.title`                        | History: `{{title}}`                                 |
-| `pageHistory.description`                  | Every version of this page and what changed in each. |
-| `pageHistory.versions_one` / `_other`      | `{{count}}` versions, since `{{date}}`               |
-| `pageHistory.showChanges`                  | Changes                                              |
-| `pageHistory.created`                      | First version of the page.                           |
-| `pageHistory.noChange`                     | The text did not change.                             |
-| `pageHistory.unchanged_one` / `_other`     | `{{count}}` unchanged paragraphs                     |
-| `pageHistory.added_one` / `_other`         | `{{count}}` paragraphs added                         |
-| `pageHistory.changed_one` / `_other`       | `{{count}}` paragraphs changed                       |
-| `pageHistory.removed_one` / `_other`       | `{{count}}` paragraphs removed                       |
-| `pageHistory.older_one` / `_other`         | `{{count}}` older versions are not shown.            |
-| `pageHistory.compare`                      | Compare versions                                     |
-| `pageHistory.compareFrom`                  | From                                                 |
-| `pageHistory.compareTo`                    | To                                                   |
-| `pageHistory.compareButton`                | Compare                                              |
-| `pageHistory.compareLatest`                | Compare with the latest                              |
-| `pageHistory.compareSame`                  | Choose two different versions.                       |
-| `pageHistory.compareLoading`               | Loading the versions…                                |
-| `pageHistory.compareError`                 | The versions could not be loaded.                    |
+| Key                                           | English                                               |
+| --------------------------------------------- | ----------------------------------------------------- |
+| `pageHistory.updated`                         | Updated                                               |
+| `pageHistory.versionCount` / `_one`, `_other` | `{{count}}` versions                                  |
+| `pageHistory.link`                            | Page history                                          |
+| `pageHistory.title`                           | History: `{{title}}`                                  |
+| `pageHistory.description`                     | Every version of this page and what changed in each.  |
+| `pageHistory.versions` / `_one`, `_other`     | `{{count}}` versions, since `{{date}}`                |
+| `pageHistory.created`                         | First version of the page.                            |
+| `pageHistory.noChange`                        | The text did not change.                              |
+| `pageHistory.unchanged` / `_one`, `_other`    | `{{count}}` unchanged paragraphs                      |
+| `pageHistory.added` / `_one`, `_other`        | `{{count}}` paragraphs added                          |
+| `pageHistory.changed` / `_one`, `_other`      | `{{count}}` paragraphs changed                        |
+| `pageHistory.removed` / `_one`, `_other`      | `{{count}}` paragraphs removed                        |
+| `pageHistory.older` / `_one`, `_other`        | `{{count}}` older versions are not shown.             |
+| `pageHistory.newSince`                        | Changed since your last visit                         |
+| `pageHistory.period`                          | Period                                                |
+| `pageHistory.presetVisit`                     | Since your last visit                                 |
+| `pageHistory.presetLatest`                    | Latest change                                         |
+| `pageHistory.presetWeek`                      | Last 7 days                                           |
+| `pageHistory.presetMonth`                     | Last 30 days                                          |
+| `pageHistory.presetAll`                       | From the start                                        |
+| `pageHistory.presetFirstVisit`                | Your first visit: nothing to compare yet              |
+| `pageHistory.presetNothingNew`                | Nothing new since your last visit                     |
+| `pageHistory.presetEmptyWeek`                 | No changes in the last 7 days                         |
+| `pageHistory.presetEmptyMonth`                | No changes in the last 30 days                        |
+| `pageHistory.timeline`                        | Versions of the page, oldest first                    |
+| `pageHistory.hint`                            | Click a dot to see that change, or drag over several. |
+| `pageHistory.legendNew`                       | new for you                                           |
+| `pageHistory.legendSeen`                      | seen                                                  |
+| `pageHistory.legendSize`                      | bigger dot, more text changed                         |
+| `pageHistory.lastVisit`                       | last visit                                            |
+| `pageHistory.changedOn`                       | What changed on `{{date}}`                            |
+| `pageHistory.changedBetween`                  | What changed from `{{from}}` to `{{to}}`              |
+| `pageHistory.firstVersion`                    | The first version of the page                         |
+| `pageHistory.sinceFirst`                      | What changed since the first version                  |
+| `pageHistory.changesBy` / `_one`, `_other`    | `{{count}}` changes by `{{authors}}`                  |
+| `pageHistory.more` / `_one`, `_other`         | and `{{count}}` more                                  |
+| `pageHistory.noTextChange`                    | no change to the text                                 |
+| `pageHistory.error`                           | The versions could not be loaded.                     |
